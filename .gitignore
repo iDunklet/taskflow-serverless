@@ -1,0 +1,36 @@
+
+# Dependencies
+node_modules/
+
+# Compiled TypeScript
+dist/
+build/
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+
+# AWS credentials and local configuration
+.aws/
+.aws-sam/
+.serverless/
+*.pem
+*.key
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Test coverage
+coverage/
+
+# Editor and operating system
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# TypeScript cache
+*.tsbuildinfo

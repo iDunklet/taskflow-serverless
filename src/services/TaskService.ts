@@ -1,73 +1,44 @@
-
+import { randomUUID } from "node:crypto";
 import type { Task } from '../models/Task';
-
+import { TaskRepository } from '../repositories/TaskRepository';
 export class TaskService {
+    private taskRepository = new TaskRepository();
 
-    private tasks: Task[] = [
-        {
-            id: 1,
-            title: 'Aprender TypeScript',
-            description: 'Aprender a crear una API REST',
-            status: 'IN_PROGRESS',
-            completed: false
-        },
-        {
-            id: 2,
-            title: 'Aprender AWS',
-            description: 'Aprender Lambda y DynamoDB',
-            status: 'PENDING',
-            completed: false
-        }
-    ];
+    
 
-    private nextId: number = 3;
-
-    public getAllTasks(): Task[] {
-        return this.tasks;
+    public getAllTasks(): Promise<Task[]> {
+        return this.taskRepository.findAll();
     }
-    public getTaskById(id: number): Task | undefined {
-        return this.tasks.find(task => task.id === id);
+
+    public async getTaskById(id: string): Promise<Task | undefined> {
+        const task = await this.taskRepository.findById(id);
+        return task;
+        
     }
     
-    public createTask(task: Omit<Task, 'id'|'completed'>): Task {
+    public async createTask(task: Omit<Task, 'id' | 'completed'>): Promise<Task> {
         const newTask: Task = {
             ...task,
-            id: this.nextId++,
+            id: randomUUID(),
             completed: false
         };
-        this.tasks.push(newTask);
+        await this.taskRepository.save(newTask);
         return newTask;
     }
-    public updateTask(
-    id: number,
+
+    public async updateTask(
+    id: string,
     updatedTask: Omit<Task, 'id'>
-): Task | undefined {
-
-    let result: Task | undefined = undefined;
-
-    const taskIndex = this.tasks.findIndex(task => task.id === id);
-
-    if (taskIndex !== -1) {
+): Promise<Task | undefined> {
         const task: Task = {
             ...updatedTask,
             id: id
         };
-
-        this.tasks[taskIndex] = task;
-        result = task;
-    }
-
+        const result = await this.taskRepository.update(task);
     return result;
 }
-    public deleteTask(id: number): boolean {
-    const taskIndex = this.tasks.findIndex(task => task.id === id);
-    let deleted = false;
-
-    if (taskIndex !== -1) {
-        this.tasks.splice(taskIndex, 1);
-        deleted = true;
-    }
-
+    public async deleteTask(id: string): Promise<boolean> {
+    const deleted = await this.taskRepository.delete(id);
     return deleted;
 }
 }

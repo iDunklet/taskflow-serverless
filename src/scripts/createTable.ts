@@ -1,9 +1,11 @@
 import {
     DynamoDBClient,
     CreateTableCommand,
-    CreateTableCommandInput,
+    DeleteTableCommand,
     ListTablesCommand
 } from "@aws-sdk/client-dynamodb";
+
+import type { CreateTableCommandInput } from "@aws-sdk/client-dynamodb";
 
 
 
@@ -17,10 +19,23 @@ const client = new DynamoDBClient({
     }
 });
 
+const deleteTable = async () => {
+    try {
+        const command = new DeleteTableCommand({
+            TableName: "Tasks"
+        });
+
+        await client.send(command);
+        console.log("Table Tasks deleted successfully!");
+    } catch (error) {
+        console.error("Error deleting table:", error);
+        process.exitCode = 1;
+    }
+};
 const createTable = async () => {
     try {const params: CreateTableCommandInput = {
         TableName: "Tasks", AttributeDefinitions: [
-            { AttributeName: "id", AttributeType: "N" }
+            { AttributeName: "id", AttributeType: "S" }
         ], KeySchema: [
             { AttributeName: "id", KeyType: "HASH" }
         ], BillingMode: "PAY_PER_REQUEST"
